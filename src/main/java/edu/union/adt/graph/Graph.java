@@ -1,4 +1,6 @@
 package edu.union.adt.graph;
+import java.util.HashMap;
+import java.util.*;
 
 /**
  * A graph that establishes connections (edges) between objects of
@@ -14,15 +16,19 @@ package edu.union.adt.graph;
  * vertices.
  *
  * @author Aaron G. Cass
+ * @author Duri Abdurahman Duri
  * @version 1
  */
 public class Graph<V>
 {
+    HashMap<V, HashMap<V,Boolean>> graph;
+    int count = 0;
     /**
      * Create an empty graph.
      */
     public Graph() 
     {
+        graph  =  new HashMap<V, HashMap<V,Boolean>>();
     }
 
     /**
@@ -30,7 +36,7 @@ public class Graph<V>
      */
     public int numVertices()
     {
-        return 0;
+        return graph.size();
     }
 
     /**
@@ -38,7 +44,7 @@ public class Graph<V>
      */
     public int numEdges()
     {
-        return 0;
+        return count;
     }
 
     /**
@@ -51,7 +57,12 @@ public class Graph<V>
      */
     public int degree(V vertex)
     {
-        return 0;
+        if(graph.containsKey(vertex)){
+            return graph.get(vertex).size();
+        }
+        else{
+            throw new RuntimeException("Vertex does not exist in this Graph");
+        }       
     }
 
     /**
@@ -65,6 +76,16 @@ public class Graph<V>
      */
     public void addEdge(V from, V to)
     {
+        if(!graph.containsKey(from)){
+            this.addVertex(from);
+        }
+        if(!graph.containsKey(to)){
+            this.addVertex(to);
+        }
+        if(graph.get(from).get(to) == null){
+            graph.get(from).put(to, true);
+        }
+        this.count++;
     }
 
     /**
@@ -76,6 +97,9 @@ public class Graph<V>
      */
     public void addVertex(V vertex)
     {
+        if(!graph.containsKey(vertex)){
+            graph.put(vertex, new HashMap<V, Boolean>());
+        }
     }
 
     /**
@@ -84,7 +108,7 @@ public class Graph<V>
      */
     public Iterable<V> getVertices()
     {
-        return null;
+        return (Iterable<V>)graph.keySet();
     }
 
     /**
@@ -102,7 +126,8 @@ public class Graph<V>
      */
     public Iterable<V> adjacentTo(V from)
     {
-        return null;
+        if(!graph.containsKey(from)) return null;
+        return (Iterable<V>) graph.get(from).keySet();
     }
 
     /**
@@ -113,7 +138,7 @@ public class Graph<V>
      */
     public boolean contains(V vertex)
     {
-        return false;
+        return graph.containsKey(vertex);
     }
 
     /**
@@ -129,7 +154,15 @@ public class Graph<V>
      */
     public boolean hasEdge(V from, V to)
     {
-        return false;
+        if(!graph.containsKey(from)){
+            return false;
+        }
+        if (graph.get(from).get(to) == null){
+            return false;
+        }
+        else{
+            return graph.get(from).get(to);
+        }  
     }
 
     /**
@@ -164,6 +197,35 @@ public class Graph<V>
      */
     public String toString()
     {
-        return "";
+        String result = "";
+        Boolean firstIt = true;
+        for(V vertex: this.getVertices()){
+            result = result + vertex+":";
+            firstIt = true;
+            for(V adjVertex: graph.get(vertex).keySet()){
+                if(firstIt){
+                    result = result + " " + adjVertex;
+                    firstIt = false;
+                }else{
+                    result=result+" ,"+adjVertex;
+                }
+            }
+            result=result+"\n";
+
+        }
+        return result;
+    }
+
+
+    /**
+     * @return the boolean equivalence whether this Graph is identical
+     * to the one passed into the argument.
+     */
+    public boolean equals(Object other){
+        if(other == null) return false;
+        if(!(other instanceof Graph)) return false;
+        if(this == other) return true;
+        Graph otherGraph = (Graph)other;
+        return this.toString().equals(otherGraph.toString());
     }
 }
